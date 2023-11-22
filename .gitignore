@@ -2,3 +2,6 @@
 *.log
 *.ds
 *.onnx
+*.pyc
+*.json
+*tfevents*
