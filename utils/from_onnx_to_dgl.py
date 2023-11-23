@@ -71,22 +71,32 @@ def onnx2dgl(
         fianl_res=list()
         for idx in range(arr.shape[0]):
             res = list()
+            # origin
             res.append(arr.mean())
             res.append(arr.var())
-            res.append(arr.min())
             res.append(arr.max())
+            res.append(arr.min())
+            
 
             num_max = np.max(arr)
             num_min = np.min(arr)
-            arr = (arr-num_min)/(num_max-num_min)
+            arr_norm = (arr-num_min)/(num_max-num_min)
 
-            tmp = arr[idx,:]
+            res.append(arr_norm.mean(axis=1).var())
+
+            tmp = arr_norm[idx,:]
+            # every channel
             res.append(tmp.mean())
             res.append(tmp.var())
             res.append(tmp.min())
             res.append(tmp.max())
-            res.append(arr.mean())
-            res.append(arr.var())
+
+            arr_mean = np.mean(arr)
+            arr_one_norm = np.greater_equal(arr, arr_mean.reshape(-1, 1)).astype(np.float32)
+            tmp_one=arr_one_norm[idx,:]
+
+            res.append(tmp_one.mean())
+
             fianl_res.append(res)
         
         arr = fianl_res
