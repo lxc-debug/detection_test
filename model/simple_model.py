@@ -21,10 +21,10 @@ class SimpleModel(nn.Module):
     def __call__(self, input_tensor):
         k = self.k_trans(input_tensor)
         v = self.v_trans(input_tensor)
-        
 
         attention = torch.matmul(self.q, torch.transpose(k, 1, 2))
+        attention = torch.nn.functional.softmax(attention, dim=-1)
         res = torch.matmul(attention, v)
-        res = torch.squeeze(res)        
+        res = torch.squeeze(res)
         res = self.classifier(res)
         return res

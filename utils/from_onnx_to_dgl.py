@@ -19,7 +19,7 @@ def model2onnx(
         model.load_state_dict(stat)
 
     # 这里要判断一下模型的架构是否是对应的
-    if args.use_archi:  
+    if args.use_archi:
         if args.architecture != model_name.split('/')[-1].split('_')[1]:
             return
         onnx_model_path = os.path.join(
@@ -57,24 +57,49 @@ def onnx2dgl(
         ).reshape(par.dims)
 
     for index, node in enumerate(graph.node):
-        if index==len(graph.node)-1:
+        if index == len(graph.node)-1:
             for in_put in node.input:
-                if in_put in parameter_dict.keys() and parameter_dict[in_put].ndim ==2:
+                if in_put in parameter_dict.keys() and parameter_dict[in_put].ndim == 2:
                     arr = parameter_dict[in_put]
                     break
 
-
     if arr.ndim != 2:
-        raise ValueError(f'The dimension of the last layer must be 2.ndmi:{arr.ndim},modelname:{model_path}')
+        raise ValueError(
+            f'The dimension of the last layer must be 2.ndmi:{arr.ndim},modelname:{model_path}')
 
-    num_max = np.max(arr)
-    num_min = np.min(arr)
-    arr = (arr-num_min)/(num_max-num_min)  # minmax_norm
+    if args.use_base:   # norm->mean->var for fairness also use 10 features
+        fianl_res=list()
+        for idx in range(arr.shape[0]):
+            res = list()
+            res.append(arr.mean())
+            res.append(arr.var())
+            res.append(arr.min())
+            res.append(arr.max())
 
-    colum_shape = arr.shape[1]
-    bins = np.linspace(0, 1, args.bin_num)
-    histograms = np.array([np.histogram(arr[idx, :], bins=bins)[0]
-                  for idx in range(arr.shape[0])])
-    arr = histograms/colum_shape  # bins for rate
+            num_max = np.max(arr)
+            num_min = np.min(arr)
+            arr = (arr-num_min)/(num_max-num_min)
+
+            tmp = arr[idx,:]
+            res.append(tmp.mean())
+            res.append(tmp.var())
+            res.append(tmp.min())
+            res.append(tmp.max())
+            res.append(arr.mean())
+            res.append(arr.var())
+            fianl_res.append(res)
+        
+        arr = fianl_res
+
+    else:
+        num_max = np.max(arr)
+        num_min = np.min(arr)
+        arr = (arr-num_min)/(num_max-num_min)  # minmax_norm
+
+        colum_shape = arr.shape[1]
+        bins = np.linspace(0, 1, args.bin_num)
+        histograms = np.array([np.histogram(arr[idx, :], bins=bins)[0]
+                               for idx in range(arr.shape[0])])
+        arr = histograms/colum_shape  # bins for probability
 
     return (torch.tensor(arr, dtype=torch.float32), torch.tensor(is_poisoned, dtype=torch.long))

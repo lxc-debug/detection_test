@@ -33,7 +33,7 @@ parser.add_argument(
 # option
 parser.add_argument(
     '--use_list', default=['leader_one'], nargs='+', help='which dataset to use')
-parser.add_argument('--architecture', default='inceptionv3',
+parser.add_argument('--architecture', default='resnet50',
                     help='which architecture to select')
 
 # switch
@@ -43,6 +43,7 @@ parser.add_argument('--load_parameter', default=False,
                     action='store_true', help='whether to load model to onnx')
 parser.add_argument('--process_data', default=False,
                     action='store_true', help='whether to process the raw data')
+parser.add_argument('--use_base',default=False,action='store_true',help='whether use base method to process data')
 
 # hyperparameters
 parser.add_argument('--bin_num', default=11, type=int, help='number of bins')
