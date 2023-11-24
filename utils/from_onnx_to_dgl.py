@@ -11,13 +11,6 @@ def model2onnx(
     input_tensor: torch.Tensor,
     save_dir: str = args.onnx_model,
 ) -> None:
-    if model is None:
-        model = torch.load(model_name)
-        model = model.cpu()
-    else:
-        stat = torch.load(model_name)
-        model.load_state_dict(stat)
-
     # 这里要判断一下模型的架构是否是对应的
     if args.use_archi:
         if args.architecture != model_name.split('/')[-1].split('_')[1]:
@@ -30,6 +23,14 @@ def model2onnx(
 
     if not os.path.exists(os.path.dirname(onnx_model_path)):
         os.makedirs(os.path.dirname(onnx_model_path))
+
+    # judge before loading
+    if model is None:
+        model = torch.load(model_name)
+        model = model.cpu()
+    else:
+        stat = torch.load(model_name)
+        model.load_state_dict(stat)
 
     torch.onnx.export(model, input_tensor, onnx_model_path)
 
@@ -112,4 +113,6 @@ def onnx2dgl(
                                for idx in range(arr.shape[0])])
         arr = histograms/colum_shape  # bins for probability
 
-    return (torch.tensor(arr, dtype=torch.float32), torch.tensor(is_poisoned, dtype=torch.long))
+    # # 这里先用padding去解决问题了，但是后面感觉肯定不能这么整
+    # arr=np.pad(arr, ((0, args.padding_dim-arr.shape[0]), (0, 0)), 'constant',constant_values=0)
+    return arr, is_poisoned

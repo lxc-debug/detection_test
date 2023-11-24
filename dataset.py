@@ -6,6 +6,7 @@ import os
 from glob import glob
 from tqdm import tqdm
 import re
+import numpy as np
 
 
 class MyDataset(Dataset):
@@ -35,7 +36,7 @@ class MyDataset(Dataset):
                     model_paths = os.path.join(
                         self.save_dir, model_use, self.mode, '*.onnx')
 
-                model_paths=glob(model_paths)
+                model_paths = glob(model_paths)
                 for model_path in tqdm(model_paths, desc=f'正在从{model_use}的{self.mode}的结构{args.architecture if args.use_archi else "all"}:onnx数据导入dataset'):
                     if 'clean' in re.split(r'\.|/|_', model_path):
                         is_poisoned = 0
@@ -48,7 +49,7 @@ class MyDataset(Dataset):
 
                     self.data.append(data_tuple[0])
                     self.label.append(data_tuple[1])
-            
+
             self._save(save_path)
 
         else:  # load
@@ -79,7 +80,7 @@ class MyDataset(Dataset):
 
         for dir in dir_list:
             names = glob(os.path.join(dir, '*.pt'))
-            for name in tqdm(names,desc=f'将{dir.split("/")[-1]}中的模型转换为onnx'):
+            for name in tqdm(names, desc=f'将{dir.split("/")[-1]}中的模型转换为onnx'):
                 model2onnx(model, name, input_tensor, os.path.join(
                     self.save_dir, 'leader_one', self.mode))
 
@@ -98,7 +99,7 @@ class MyDataset(Dataset):
 
         for dir in dir_list:
             names = glob(os.path.join(dir, '*.pt'))
-            for name in tqdm(names,desc=f'将{dir.split("/")[-1]}中的模型转换为onnx'):
+            for name in tqdm(names, desc=f'将{dir.split("/")[-1]}中的模型转换为onnx'):
                 model2onnx(model, name, input_tensor, os.path.join(
                     self.save_dir, 'leader_two', self.mode))
 
@@ -122,3 +123,18 @@ class MyDataset(Dataset):
 
     def __getitem__(self, index) -> tuple:
         return self.data[index], self.label[index]
+
+    @staticmethod
+    def coll_fn(batch):
+        max_len = max(batch, key=lambda x: x[0].shape[0])[0].shape[0]
+
+        data_li = list()
+        label_li = list()
+
+        for data, label in batch:
+            data = np.pad(
+                data, ((0, max_len-data.shape[0]), (0, 0)), 'constant', constant_values=0)
+            data_li.append(data)
+            label_li.append(label)
+
+        return torch.tensor(np.array(data_li,dtype=np.float32), dtype=torch.float32), torch.tensor(np.array(label_li,np.int64), dtype=torch.long)

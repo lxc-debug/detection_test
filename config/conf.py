@@ -32,8 +32,8 @@ parser.add_argument(
 
 # option
 parser.add_argument(
-    '--use_list', default=['leader_one'], nargs='+', help='which dataset to use')
-parser.add_argument('--architecture', default='resnet50',
+    '--use_list', default=['leader_two'], nargs='+', help='which dataset to use')
+parser.add_argument('--architecture', default='inceptionv3',
                     help='which architecture to select')
 
 # switch
@@ -43,7 +43,8 @@ parser.add_argument('--load_parameter', default=False,
                     action='store_true', help='whether to load model to onnx')
 parser.add_argument('--process_data', default=False,
                     action='store_true', help='whether to process the raw data')
-parser.add_argument('--use_base',default=False,action='store_true',help='whether use base method to process data')
+parser.add_argument('--use_base', default=False, action='store_true',
+                    help='whether use base method to process data')
 
 # hyperparameters
 parser.add_argument('--bin_num', default=11, type=int, help='number of bins')
@@ -55,11 +56,14 @@ parser.add_argument('--delta', default=0, type=float,
                     help='delta for early stopping')
 parser.add_argument('--batch_size', default=200, type=int,
                     help='batch size for train eval test')
-parser.add_argument('--epochs', default=1000, type=int, help='epochs for train')
+parser.add_argument('--epochs', default=5000,
+                    type=int, help='epochs for train')
 parser.add_argument('--lr', default=1e-4, type=float,
                     help='learning rate for train')
 parser.add_argument('--weight_decay', default=0,
                     type=float, help='weight_decay for train')
+parser.add_argument('--padding_dim', default=30,
+                    type=int, help='padding dim for data')
 
 
 # instance

@@ -18,11 +18,11 @@ class Experiment():
         self.eval_dataset = eval_dataset
         self.test_dataset = test_dataset
         self.train_dataloader = DataLoader(
-            self.train_dataset, batch_size=args.batch_size, shuffle=True)
+            self.train_dataset, batch_size=args.batch_size, shuffle=True, collate_fn=self.train_dataset.coll_fn)
         self.eval_dataloader = DataLoader(
-            self.eval_dataset, batch_size=args.batch_size, shuffle=True)
+            self.eval_dataset, batch_size=args.batch_size, shuffle=True, collate_fn=self.train_dataset.coll_fn)
         self.test_dataloader = DataLoader(
-            self.test_dataset, batch_size=args.batch_size, shuffle=True)
+            self.test_dataset, batch_size=args.batch_size, shuffle=True, collate_fn=self.train_dataset.coll_fn)
 
         if torch.cuda.is_available():
             self.device = torch.device('cuda')
@@ -122,12 +122,13 @@ class Experiment():
             self.total_test_correct += correct
             self.total_test_loss += loss.item()*res.shape[0]
 
-            self.pre_label.extend(torch.argmax(res, dim=-1).tolist())
+            self.pre_label.extend(
+                torch.nn.functional.softmax(res, dim=-1)[:, 1].tolist())
             self.label.extend(label.tolist())
 
         acc = self.total_test_correct/len(self.test_dataset)
         loss = self.total_test_loss/len(self.test_dataset)
-        score = roc_auc_score(np.array(self.pre_label), np.array(self.label))
+        score = roc_auc_score(np.array(self.label), np.array(self.pre_label))
 
         logger.info(
             f'test dataset acc:{acc:8.4f}|loss:{loss:8.4f}|auc_roc_score:{score:8.6f}')
