@@ -11,7 +11,11 @@ class SimpleModel(nn.Module):
 
         self.classifier = nn.Sequential(
             nn.Linear(args.hidden_dim, args.hidden_dim//2),
+            nn.ReLU(),
+            nn.Dropout(p=0.3),
             nn.Linear(args.hidden_dim//2, args.hidden_dim//4),
+            nn.ReLU(),
+            nn.Dropout(p=0.3),
             nn.Linear(args.hidden_dim//4, 2)
         )
 

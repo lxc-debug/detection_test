@@ -24,6 +24,12 @@ parser.add_argument('--leadertwo_eval_data_dir', default=['data/leader_two/poiso
                     'data/leader_two/clean_models_eval'], nargs='+', help='position of leadertwo eval data')
 parser.add_argument('--leadertwo_test_data_dir', default=['data/leader_two/poisoned_models_test',
                     'data/leader_two/clean_models_test'], nargs='+', help='position of leadertwo test data')
+parser.add_argument('--vgg_train_data_dir', default=['data/vgg/poisoned_models_trainval',
+                    'data/vgg/clean_models_trainval'], nargs='+', help='position of leadertwo train data')
+parser.add_argument('--vgg_eval_data_dir', default=['data/vgg/poisoned_models_eval',
+                    'data/vgg/clean_models_eval'], nargs='+', help='position of leadertwo eval data')
+parser.add_argument('--vgg_test_data_dir', default=['data/vgg/poisoned_models_test',
+                    'data/vgg/clean_models_test'], nargs='+', help='position of leadertwo test data')
 parser.add_argument('--para_save_dir', default='./best_parameter',
                     help='directory for saving best parameter')
 parser.add_argument(
