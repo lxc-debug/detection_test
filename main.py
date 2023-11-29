@@ -2,7 +2,8 @@ import sys
 sys.path.append('./config')
 sys.path.append('./utils')
 sys.path.append('./model')
-from config.conf import logger, args
+from config.conf import args
+from config.log_conf import logger,file_logger
 from train import Experiment
 from model.simple_model import SimpleModel
 from dataset import MyDataset
@@ -15,6 +16,9 @@ from utils.tar import *
 # print(glob('./log/*'))
 
 if __name__ == '__main__':
+
+    file_logger.info(f'parameter config lr:{args.lr},weight_decay:{args.weight_decay}')
+
     train_dataset = MyDataset(mode='train')
     eval_dataset = MyDataset(mode='eval')
     test_dataset = MyDataset(mode='test')

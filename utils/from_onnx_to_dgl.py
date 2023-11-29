@@ -73,34 +73,38 @@ def onnx2dgl(
         for idx in range(arr.shape[0]):
             res = list()
             # origin
-            res.append(arr.mean())
-            res.append(arr.var())
-            res.append(arr.max())
-            res.append(arr.min())
+            arr_tmp = arr[idx,:]
+            # res.append(arr_tmp.min())
+            # res.append(arr_tmp.max())
+            # res.append(arr_tmp.mean())
+            # res.append(arr_tmp.var())
+            # res.append(arr.mean(axis=1).var())
             
 
             num_max = np.max(arr)
             num_min = np.min(arr)
             arr_norm = (arr-num_min)/(num_max-num_min)
 
-            res.append(arr_norm.mean(axis=1).var())
-
             tmp = arr_norm[idx,:]
-            # every channel
-            res.append(tmp.mean())
-            res.append(tmp.var())
+            # min max norm
             res.append(tmp.min())
             res.append(tmp.max())
+            res.append(tmp.mean())
+            res.append(tmp.var())
+            res.append(arr_norm.mean(axis=1).var())
 
             arr_mean = np.mean(arr)
             arr_one_norm = np.greater_equal(arr, arr_mean.reshape(-1, 1)).astype(np.float32)
             tmp_one=arr_one_norm[idx,:]
 
+            # zero one norm
             res.append(tmp_one.mean())
+            res.append(tmp_one.var())
+            res.append(arr_one_norm.mean(axis=1).var())
 
             fianl_res.append(res)
         
-        arr = fianl_res
+        arr = np.array(fianl_res,dtype=np.float32)
 
     else:
         num_max = np.max(arr)

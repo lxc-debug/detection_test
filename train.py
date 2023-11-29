@@ -6,7 +6,8 @@ from utils.early_stopping import EarlyStopping
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-from config.conf import args, logger, file_logger
+from config.conf import args
+from config.log_conf import logger, file_logger
 import os
 from sklearn.metrics import roc_auc_score
 import numpy as np

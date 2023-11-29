@@ -1,9 +1,8 @@
 import logging
-from logging.config import fileConfig
+from logging.config import dictConfig
 import argparse
 
-# conf logging
-fileConfig('./config/logging.conf')
+
 
 # conf paser
 # path
@@ -29,11 +28,12 @@ parser.add_argument('--para_save_dir', default='./best_parameter',
                     help='directory for saving best parameter')
 parser.add_argument(
     '--board_log_dir', default='./log/tensorboard', help='tensorboard logging dir')
+parser.add_argument('--logdir',default='./log/experiment.log',help='directory of log file')
 
 # option
 parser.add_argument(
-    '--use_list', default=['leader_two'], nargs='+', help='which dataset to use')
-parser.add_argument('--architecture', default='inceptionv3',
+    '--use_list', default=['leader_one'], nargs='+', help='which dataset to use')
+parser.add_argument('--architecture', default='resnet50',
                     help='which architecture to select')
 
 # switch
@@ -47,7 +47,7 @@ parser.add_argument('--use_base', default=False, action='store_true',
                     help='whether use base method to process data')
 
 # hyperparameters
-parser.add_argument('--bin_num', default=11, type=int, help='number of bins')
+parser.add_argument('--bin_num', default=9, type=int, help='number of bins')
 parser.add_argument('--hidden_dim', default=32, type=int,
                     help='attention hidden dimemsion')
 parser.add_argument('--patience', default=100, type=int,
@@ -56,7 +56,7 @@ parser.add_argument('--delta', default=0, type=float,
                     help='delta for early stopping')
 parser.add_argument('--batch_size', default=200, type=int,
                     help='batch size for train eval test')
-parser.add_argument('--epochs', default=5000,
+parser.add_argument('--epochs', default=10000,
                     type=int, help='epochs for train')
 parser.add_argument('--lr', default=1e-4, type=float,
                     help='learning rate for train')
@@ -67,6 +67,4 @@ parser.add_argument('--padding_dim', default=30,
 
 
 # instance
-logger = logging.getLogger('mylog')
-file_logger = logging.getLogger('filelog')
 args = parser.parse_args()
