@@ -1,16 +1,17 @@
+from model.resnet import resnet18_mod
+from model.vgg_model import CNN_classifier
+import numpy as np
+import re
+from tqdm import tqdm
+from glob import glob
+import os
+from config.log_conf import logger
+from config.conf import args
+from utils.from_onnx_to_dgl import model2onnx, onnx2dgl
+import torch
+from torch.utils.data import Dataset
 import sys
 sys.path.append('./model')
-from torch.utils.data import Dataset
-import torch
-from utils.from_onnx_to_dgl import model2onnx, onnx2dgl
-from config.conf import args
-from config.log_conf import logger
-import os
-from glob import glob
-from tqdm import tqdm
-import re
-import numpy as np
-from model.vgg_model import CNN_classifier
 
 
 class MyDataset(Dataset):
@@ -29,7 +30,9 @@ class MyDataset(Dataset):
                 elif model_use == 'leader_two':
                     self._trans_leader_two_model()
                 if model_use == 'vgg':
-                    self._trains_vgg_model()
+                    self._trans_vgg_model()
+                if model_use == 'resnet':
+                    self._trans_resnet_model()
 
         file_name = '+'.join(self.use_list)
         save_path = os.path.join(args.data_save, file_name, self.mode)
@@ -71,7 +74,7 @@ class MyDataset(Dataset):
             logger.info(f'载入{self.mode}数据')
             self._load(save_path)
 
-    def _trains_vgg_model(self):
+    def _trans_vgg_model(self):
         model = CNN_classifier()
         input_tensor = torch.randn(1, 3, 32, 32)
 
@@ -89,8 +92,26 @@ class MyDataset(Dataset):
             for name in tqdm(names, desc=f'将{dir.split("/")[-1]}中的模型转换为onnx'):
                 model2onnx(model, name, input_tensor, os.path.join(
                     self.save_dir, 'vgg', self.mode))
-    
-    
+
+    def _trans_resnet_model(self):
+        model = resnet18_mod(num_classes=200)  # tiny_image的大小
+        input_tensor = torch.randn(1, 3, 32, 32)
+
+        if self.mode == 'train':
+            dir_list = args.resnet_train_data_dir
+        elif self.mode == 'eval':
+            dir_list = args.resnet_eval_data_dir
+        elif self.mode == 'test':
+            dir_list = args.resnet_test_data_dir
+        else:
+            raise ValueError('mode must be train or eval or test')
+
+        for dir in dir_list:
+            names = glob(os.path.join(dir, '*.pt'))
+            for name in tqdm(names, desc=f'将{dir.split("/")[-1]}中的模型转换为onnx'):
+                model2onnx(model, name, input_tensor, os.path.join(
+                    self.save_dir, 'resnet', self.mode))
+
     def _trans_leader_one_model(self):
         model = None
         input_tensor = torch.randn(1, 3, 224, 224)
@@ -163,4 +184,4 @@ class MyDataset(Dataset):
             data_li.append(data)
             label_li.append(label)
 
-        return torch.tensor(np.array(data_li,dtype=np.float32), dtype=torch.float32), torch.tensor(np.array(label_li,np.int64), dtype=torch.long)
+        return torch.tensor(np.array(data_li, dtype=np.float32), dtype=torch.float32), torch.tensor(np.array(label_li, np.int64), dtype=torch.long)

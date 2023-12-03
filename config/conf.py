@@ -30,6 +30,12 @@ parser.add_argument('--vgg_eval_data_dir', default=['data/vgg/poisoned_models_ev
                     'data/vgg/clean_models_eval'], nargs='+', help='position of leadertwo eval data')
 parser.add_argument('--vgg_test_data_dir', default=['data/vgg/poisoned_models_test',
                     'data/vgg/clean_models_test'], nargs='+', help='position of leadertwo test data')
+parser.add_argument('--resnet_train_data_dir', default=['data/resnet/poisoned_models_trainval',
+                    'data/resnet/clean_models_trainval'], nargs='+', help='position of leadertwo train data')
+parser.add_argument('--resnet_eval_data_dir', default=['data/resnet/poisoned_models_eval',
+                    'data/resnet/clean_models_eval'], nargs='+', help='position of leadertwo eval data')
+parser.add_argument('--resnet_test_data_dir', default=['data/resnet/poisoned_models_test',
+                    'data/resnet/clean_models_test'], nargs='+', help='position of leadertwo test data')
 parser.add_argument('--para_save_dir', default='./best_parameter',
                     help='directory for saving best parameter')
 parser.add_argument(
@@ -53,7 +59,7 @@ parser.add_argument('--use_base', default=False, action='store_true',
                     help='whether use base method to process data')
 
 # hyperparameters
-parser.add_argument('--bin_num', default=9, type=int, help='number of bins')
+parser.add_argument('--bin_num', default=14, type=int, help='number of bins')
 parser.add_argument('--hidden_dim', default=32, type=int,
                     help='attention hidden dimemsion')
 parser.add_argument('--patience', default=100, type=int,

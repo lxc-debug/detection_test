@@ -341,3 +341,64 @@ def tar_vgg():
 
     for item in tqdm(poison_test_list, desc='tar poison test'):
         shutil.copy(item, poison_test_dest)
+
+
+def tar_resnet():
+    res_dir = os.path.join(args.data_path, 'resnet')
+
+    clean_train_list = glob.glob(
+        '/data/liuxuchao/model_data/tiny_image/clean_models_train/*')
+    poison_train_list = glob.glob(
+        '/data/liuxuchao/model_data/tiny_image/poisoned_models_train/*')
+
+    clean_train_dest = os.path.join(res_dir, 'clean_models_trainval')
+    poison_train_dest = os.path.join(res_dir, 'poisoned_models_trainval')
+    if not os.path.exists(clean_train_dest):
+        os.makedirs(clean_train_dest)
+    if not os.path.exists(poison_train_dest):
+        os.makedirs(poison_train_dest)
+
+    for item in tqdm(clean_train_list, desc='tar clean train'):
+        shutil.copy(item, clean_train_dest)
+
+    for item in tqdm(poison_train_list, desc='tar poison train'):
+        shutil.copy(item, poison_train_dest)
+
+    # for only have test data, split test to eval and test data
+    clean_li = glob.glob('/data/liuxuchao/model_data/tiny_image/clean_models_test/*')
+    poison_li = glob.glob(
+        '/data/liuxuchao/model_data/tiny_image/poisoned_models_test/*')
+    clean_li.sort()
+    poison_li.sort()
+
+    clean_eval_list = clean_li[:-30]
+    poison_eval_list = poison_li[:30]
+
+    clean_eval_dest = os.path.join(res_dir, 'clean_models_eval')
+    poison_eval_dest = os.path.join(res_dir, 'poisoned_models_eval')
+    if not os.path.exists(clean_eval_dest):
+        os.makedirs(clean_eval_dest)
+    if not os.path.exists(poison_eval_dest):
+        os.makedirs(poison_eval_dest)
+
+    for item in tqdm(clean_eval_list, desc='tar clean eval'):
+        shutil.copy(item, clean_eval_dest)
+
+    for item in tqdm(poison_eval_list, desc='tar poison eval'):
+        shutil.copy(item, poison_eval_dest)
+
+    clean_test_list = clean_li[-30:]
+    poison_test_list = poison_li[-30:]
+
+    clean_test_dest = os.path.join(res_dir, 'clean_models_test')
+    poison_test_dest = os.path.join(res_dir, 'poisoned_models_test')
+    if not os.path.exists(clean_test_dest):
+        os.makedirs(clean_test_dest)
+    if not os.path.exists(poison_test_dest):
+        os.makedirs(poison_test_dest)
+
+    for item in tqdm(clean_test_list, desc='tar clean test'):
+        shutil.copy(item, clean_test_dest)
+
+    for item in tqdm(poison_test_list, desc='tar poison test'):
+        shutil.copy(item, poison_test_dest)
