@@ -9,11 +9,21 @@ from model.simple_model import SimpleModel
 from dataset import MyDataset
 from glob import glob
 from utils.tar import *
+import numpy as np
+import random
+import torch
 
 
 # use test
 # tar_one()
 # print(glob('./log/*'))
+
+my_seed=0
+np.random.seed(seed=my_seed)
+random.seed(a=my_seed)
+torch.manual_seed(my_seed)
+torch.cuda.manual_seed(my_seed)
+torch.cuda.manual_seed_all(my_seed)
 
 if __name__ == '__main__':
 

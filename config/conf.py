@@ -57,6 +57,7 @@ parser.add_argument('--process_data', default=False,
                     action='store_true', help='whether to process the raw data')
 parser.add_argument('--use_base', default=False, action='store_true',
                     help='whether use base method to process data')
+parser.add_argument('--use_three',default=False,action='store_true',help='whether use architecture 1/3 data')
 
 # hyperparameters
 parser.add_argument('--bin_num', default=14, type=int, help='number of bins')
@@ -68,7 +69,7 @@ parser.add_argument('--delta', default=0, type=float,
                     help='delta for early stopping')
 parser.add_argument('--batch_size', default=200, type=int,
                     help='batch size for train eval test')
-parser.add_argument('--epochs', default=10000,
+parser.add_argument('--epochs', default=1000000,
                     type=int, help='epochs for train')
 parser.add_argument('--lr', default=1e-4, type=float,
                     help='learning rate for train')

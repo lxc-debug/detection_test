@@ -74,11 +74,11 @@ def onnx2dgl(
             res = list()
             # origin
             arr_tmp = arr[idx,:]
-            # res.append(arr_tmp.min())
-            # res.append(arr_tmp.max())
-            # res.append(arr_tmp.mean())
-            # res.append(arr_tmp.var())
-            # res.append(arr.mean(axis=1).var())
+            res.append(arr_tmp.min())
+            res.append(arr_tmp.max())
+            res.append(arr_tmp.mean())
+            res.append(arr_tmp.var())
+            res.append(arr.mean(axis=1).var())
             
 
             num_max = np.max(arr)
