@@ -46,8 +46,7 @@ class MyDataset(Dataset):
                         self.save_dir, model_use, self.mode, '*.onnx')
 
                 model_paths = glob(model_paths)
-                if args.use_three and self.mode=='train':   # only sample for train dataset
-                    model_paths=model_paths[:len(model_paths)//3] # for the experiment of compare whether the method work needs thr architecture info or not.
+                
 
                 for model_path in tqdm(model_paths, desc=f'正在从{model_use}的{self.mode}的结构{args.architecture if args.use_archi else "all"}:onnx数据导入dataset'):
                     if 'clean' in re.split(r'\.|/|_', model_path):

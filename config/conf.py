@@ -3,7 +3,6 @@ from logging.config import dictConfig
 import argparse
 
 
-
 # conf paser
 # path
 parser = argparse.ArgumentParser()
@@ -40,13 +39,17 @@ parser.add_argument('--para_save_dir', default='./best_parameter',
                     help='directory for saving best parameter')
 parser.add_argument(
     '--board_log_dir', default='./log/tensorboard', help='tensorboard logging dir')
-parser.add_argument('--logdir',default='./log/experiment.log',help='directory of log file')
+parser.add_argument('--logdir', default='./log/experiment.log',
+                    help='directory of log file')
 
 # option
 parser.add_argument(
     '--use_list', default=['leader_one'], nargs='+', help='which dataset to use')
 parser.add_argument('--architecture', default='resnet50',
                     help='which architecture to select')
+parser.add_argument('--embedding_type', default='trans',
+                    choices=['trans', 'nerf'], help='how to embedding position')
+
 
 # switch
 parser.add_argument('--use_archi', default=False,
@@ -57,7 +60,9 @@ parser.add_argument('--process_data', default=False,
                     action='store_true', help='whether to process the raw data')
 parser.add_argument('--use_base', default=False, action='store_true',
                     help='whether use base method to process data')
-parser.add_argument('--use_three',default=False,action='store_true',help='whether use architecture 1/3 data')
+parser.add_argument('--use_three', default=False,
+                    action='store_true', help='whether add architecture data')
+parser.add_argument('--use_q',default=False,action='store_true',help='whether use q to aggregate')
 
 # hyperparameters
 parser.add_argument('--bin_num', default=14, type=int, help='number of bins')
@@ -77,6 +82,25 @@ parser.add_argument('--weight_decay', default=0,
                     type=float, help='weight_decay for train')
 parser.add_argument('--padding_dim', default=30,
                     type=int, help='padding dim for data')
+parser.add_argument('--row_size', default=1024, type=int,
+                    help='row size of a feature')
+parser.add_argument('--op_type_size', default=215,
+                    type=int, help='size of operator type')
+parser.add_argument('--pos_emb_dim', default=16, type=int,
+                    help='the dimension of position embedding')
+# 得有这个参数来保证row_size这个列表是一个等大的，这样比较好操作
+parser.add_argument('--num_nodes', default=120, type=int,
+                    help='the number of all graph nodes')
+parser.add_argument('--n_head',default=8,type=int,help='number of the attention head')
+
+
+# op_dir
+with open('op_list.txt', mode='r', encoding='utf16') as fp:
+    content = fp.read()
+    op_li = content.split(',')
+
+parser.add_argument('--op_li', default=op_li, type=list,
+                    help='list of operate type')
 
 
 # instance
