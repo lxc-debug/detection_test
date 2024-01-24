@@ -16,6 +16,11 @@ sys.path.append('./model')
 
 class MyDataset(Dataset):
     def __init__(self, mode='train') -> None:
+        """_summary_
+            构建数据集，首先判断是否要调用模型转为onnx的函数，接下来判断是否处理过的数据是否保存了，如果已经存在直接读取就行，否则就使用onnx转张量的函数来进行数据处理。最终数据存储到self.data中，标签存放在self.label中
+        Keyword Arguments:
+            mode -- 要读取哪个数据集的数据，train，eval，test (default: {'train'})
+        """
         super().__init__()
         self.data = list()
         self.label = list()
@@ -56,10 +61,10 @@ class MyDataset(Dataset):
                     else:
                         raise NameError(f'文件命名错误,当前文件路径:{model_path}')
 
-                    data_tuple = onnx2dgl(model_path, is_poisoned=is_poisoned)
+                    data = onnx2dgl(model_path)
 
-                    self.data.append(data_tuple[0])
-                    self.label.append(data_tuple[1])
+                    self.data.append(data)
+                    self.label.append(is_poisoned)
 
             self._save(save_path)
 
@@ -77,6 +82,9 @@ class MyDataset(Dataset):
             self._load(save_path)
 
     def _trans_vgg_model(self):
+        """_summary_
+            读入vgg模型，转为onnx
+        """
         model = CNN_classifier()
         input_tensor = torch.randn(1, 3, 32, 32)
 
@@ -96,6 +104,9 @@ class MyDataset(Dataset):
                     self.save_dir, 'vgg', self.mode))
 
     def _trans_resnet_model(self):
+        """_summary_
+            读入resnet模型，转为onnx
+        """
         model = resnet18_mod(num_classes=200)  # tiny_image的大小
         input_tensor = torch.randn(1, 3, 32, 32)
 
@@ -115,6 +126,9 @@ class MyDataset(Dataset):
                     self.save_dir, 'resnet', self.mode))
 
     def _trans_leader_one_model(self):
+        """_summary_
+            读入leader_one模型，转为onnx
+        """
         model = None
         input_tensor = torch.randn(1, 3, 224, 224)
 
@@ -134,6 +148,9 @@ class MyDataset(Dataset):
                     self.save_dir, 'leader_one', self.mode))
 
     def _trans_leader_two_model(self):
+        """_summary_
+            读入leader_two模型，转为onnx
+        """
         model = None
         input_tensor = torch.randn(1, 3, 224, 224)
 
@@ -154,9 +171,19 @@ class MyDataset(Dataset):
 
     # 已经完成数据读取，后面再接着写就行
     def _load(self, save_path):
+        """_summary_
+            直接读入数据
+        Arguments:
+            save_path -- 数据存储的位置
+        """
         self.data, self.label = torch.load(save_path)
 
     def _save(self, save_path):
+        """_summary_
+            保存已经处理好的数据
+        Arguments:
+            save_path -- 数据保存的位置
+        """
         if args.use_archi:
             save_path = os.path.join(
                 save_path, args.architecture, 'data.ds')
@@ -175,6 +202,14 @@ class MyDataset(Dataset):
 
     @staticmethod
     def coll_fn(batch):
+        """_summary_
+            因为leadertwo中最后一层的数据的row_size不一定相同，这里就是在读入数据的时候，把row_size给padding到这个batch中的最大值
+        Arguments:
+            batch -- 从数据流中获取到的一个batch的数据
+
+        Returns:
+            返回一个batch的数据以及batch格式的标签
+        """
         max_len = max(batch, key=lambda x: x[0].shape[0])[0].shape[0]
 
         data_li = list()

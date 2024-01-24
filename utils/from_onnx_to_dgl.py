@@ -12,7 +12,16 @@ def model2onnx(
     input_tensor: torch.Tensor,
     save_dir: str = args.onnx_model,
 ) -> None:
-    # 这里要判断一下模型的架构是否是对应的
+    """_summary_
+    这个函数首先要判断是不是要分架构进行训练，接下来判断输入的是模型还是模型的参数，leaderboard给的都是模型，ulp的数据集给的是模型的参数，最终执行完这个函数会把模型导出成onnx的格式，然后保存到指定的位置
+    Arguments:
+        model -- 输入的是一个模型，用来导出onnx的格式
+        model_name -- 这个是模型的名称，这里其实是一个路径
+        input_tensor -- 导出onnx必须给定一个输入，这个就是随机出的形状相同的输入张量
+
+    Keyword Arguments:
+        save_dir -- onnx文件保存的位置 (default: {args.onnx_model})
+    """
     if args.use_archi:
         if args.architecture != model_name.split('/')[-1].split('_')[1]:
             return
@@ -38,8 +47,15 @@ def model2onnx(
 
 def onnx2dgl(
     model_path: str,
-    is_poisoned: int = 1,
 ) -> tuple:
+    """_summary_
+        这个函数的作用是把一个onnx格式的文件中的模型的最后一层参数提取到，然后根据超参数进行变换，如果是bin的指令，就是在参数的每一行按照0~1的大小进行分桶处理；如果是base的参数，就是手动提取一些特征，比如每一行的最大值和最小值等等。最后把处理后的结果返回
+    Arguments:
+        model_path -- 这个是onnx模型的保存轮径
+
+    Returns:
+        返回一个最后一层的参数矩阵
+    """
     # if args.use_archi:
     #     onnx_model_path = os.path.join(
     #         save_dir, args.architecture, model_name.split('/')[-1].split('.')[-2]+'.onnx')
@@ -144,7 +160,7 @@ def onnx2dgl(
 
     # # 这里先用padding去解决问题了，但是后面感觉肯定不能这么整
     # arr=np.pad(arr, ((0, args.padding_dim-arr.shape[0]), (0, 0)), 'constant',constant_values=0)
-    return arr_final, is_poisoned
+    return arr_final
 
 
 def pos_emb(

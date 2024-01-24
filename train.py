@@ -15,6 +15,14 @@ import numpy as np
 
 class Experiment():
     def __init__(self, model: nn.Module, train_dataset, eval_dataset, test_dataset) -> None:
+        """_summary_
+            准备训练用到的dataloader，模型以及优化器，还有一些日志的保存路径
+        Arguments:
+            model -- 待训练的模型
+            train_dataset -- 训练数据集
+            eval_dataset -- 验证数据集
+            test_dataset -- 测试数据集
+        """
         self.train_dataset = train_dataset
         self.eval_dataset = eval_dataset
         self.test_dataset = test_dataset
@@ -53,6 +61,11 @@ class Experiment():
         self.esp = EarlyStopping(self.model, self.save_dir)
 
     def _train(self, epoch):
+        """_summary_
+            训练模型
+        Arguments:
+            epoch -- 第几次训练
+        """
         self.model.train()
 
         self.total_correct = 0
@@ -80,6 +93,11 @@ class Experiment():
 
     @torch.no_grad()
     def _eval(self, epoch):
+        """_summary_
+            模型验证
+        Arguments:
+            epoch -- 第几次验证
+        """
         self.model.eval()
 
         self.total_eval_correct = 0
@@ -103,6 +121,9 @@ class Experiment():
 
     @torch.no_grad()
     def _test(self):
+        """_summary_
+            模型测试
+        """
         self.model.eval()
 
         self.pre_label = list()
@@ -135,6 +156,9 @@ class Experiment():
             f'test dataset acc:{acc:8.4f}|loss:{loss:8.4f}|auc_roc_score:{score:8.6f}')
 
     def __call__(self) -> None:
+        """_summary_
+            整个模型的训练过程，首先是一轮训练和验证，结束后判断是否早停，并对日志进行记录和保存
+        """
         self.writer = SummaryWriter(self.tensorboard_dir)
         for epoch in range(self.epochs):
             self._train(epoch=epoch)
