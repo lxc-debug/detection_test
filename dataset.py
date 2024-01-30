@@ -7,79 +7,16 @@ from glob import glob
 import os
 from config.log_conf import logger
 from config.conf import args
-from utils.from_onnx_to_dgl import model2onnx, onnx2dgl
+from utils.from_onnx_to_dgl import model2onnx, onnx2dgl, onnx2dgltest
 import torch
 from torch.utils.data import Dataset
 import sys
 sys.path.append('./model')
 
 
-class MyDataset(Dataset):
-    def __init__(self, mode='train') -> None:
-        """_summary_
-            构建数据集，首先判断是否要调用模型转为onnx的函数，接下来判断是否处理过的数据是否保存了，如果已经存在直接读取就行，否则就使用onnx转张量的函数来进行数据处理。最终数据存储到self.data中，标签存放在self.label中
-        Keyword Arguments:
-            mode -- 要读取哪个数据集的数据，train，eval，test (default: {'train'})
-        """
+class BaseDataset(Dataset):
+    def __init__(self) -> None:
         super().__init__()
-        self.data = list()
-        self.label = list()
-        self.mode = mode
-        self.use_list = args.use_list
-        self.save_dir = args.onnx_model
-
-        if args.load_parameter:
-            for model_use in self.use_list:
-                if model_use == 'leader_one':
-                    self._trans_leader_one_model()
-                elif model_use == 'leader_two':
-                    self._trans_leader_two_model()
-                if model_use == 'vgg':
-                    self._trans_vgg_model()
-                if model_use == 'resnet':
-                    self._trans_resnet_model()
-
-        file_name = '+'.join(self.use_list)
-        save_path = os.path.join(args.data_save, file_name, self.mode)
-        if args.process_data:  # save
-            for model_use in self.use_list:
-                if args.use_archi:
-                    model_paths = os.path.join(
-                        self.save_dir, model_use, self.mode, args.architecture, '*.onnx')
-                else:
-                    model_paths = os.path.join(
-                        self.save_dir, model_use, self.mode, '*.onnx')
-
-                model_paths = glob(model_paths)
-                
-
-                for model_path in tqdm(model_paths, desc=f'正在从{model_use}的{self.mode}的结构{args.architecture if args.use_archi else "all"}:onnx数据导入dataset'):
-                    if 'clean' in re.split(r'\.|/|_', model_path):
-                        is_poisoned = 0
-                    elif 'poisoned' in re.split(r'\.|/|_', model_path):
-                        is_poisoned = 1
-                    else:
-                        raise NameError(f'文件命名错误,当前文件路径:{model_path}')
-
-                    data = onnx2dgl(model_path)
-
-                    self.data.append(data)
-                    self.label.append(is_poisoned)
-
-            self._save(save_path)
-
-        else:  # load
-            if args.use_archi:
-                save_path = os.path.join(
-                    save_path, args.architecture, 'data.ds')
-            else:
-                save_path = os.path.join(save_path, 'data.ds')
-
-            if not os.path.exists(save_path):
-                raise ValueError('file not exists please process data')
-
-            logger.info(f'载入{self.mode}数据')
-            self._load(save_path)
 
     def _trans_vgg_model(self):
         """_summary_
@@ -169,6 +106,73 @@ class MyDataset(Dataset):
                 model2onnx(model, name, input_tensor, os.path.join(
                     self.save_dir, 'leader_two', self.mode))
 
+
+class MyDataset(BaseDataset):
+    def __init__(self, mode='train') -> None:
+        """_summary_
+            构建数据集，首先判断是否要调用模型转为onnx的函数，接下来判断是否处理过的数据是否保存了，如果已经存在直接读取就行，否则就使用onnx转张量的函数来进行数据处理。最终数据存储到self.data中，标签存放在self.label中
+        Keyword Arguments:
+            mode -- 要读取哪个数据集的数据，train，eval，test (default: {'train'})
+        """
+        super().__init__()
+        self.data = list()
+        self.label = list()
+        self.mode = mode
+        self.use_list = args.use_list
+        self.save_dir = args.onnx_model
+
+        if args.load_parameter:
+            for model_use in self.use_list:
+                if model_use == 'leader_one':
+                    self._trans_leader_one_model()
+                elif model_use == 'leader_two':
+                    self._trans_leader_two_model()
+                if model_use == 'vgg':
+                    self._trans_vgg_model()
+                if model_use == 'resnet':
+                    self._trans_resnet_model()
+
+        file_name = '+'.join(self.use_list)
+        save_path = os.path.join(args.data_save, file_name, self.mode)
+        if args.process_data:  # save
+            for model_use in self.use_list:
+                if args.use_archi:
+                    model_paths = os.path.join(
+                        self.save_dir, model_use, self.mode, args.architecture, '*.onnx')
+                else:
+                    model_paths = os.path.join(
+                        self.save_dir, model_use, self.mode, '*.onnx')
+
+                model_paths = glob(model_paths)
+
+                for model_path in tqdm(model_paths, desc=f'正在从{model_use}的{self.mode}的结构{args.architecture if args.use_archi else "all"}:onnx数据导入dataset'):
+                    if 'clean' in re.split(r'\.|/|_', model_path):
+                        is_poisoned = 0
+                    elif 'poisoned' in re.split(r'\.|/|_', model_path):
+                        is_poisoned = 1
+                    else:
+                        raise NameError(f'文件命名错误,当前文件路径:{model_path}')
+
+                    data = onnx2dgl(model_path)
+
+                    self.data.append(data)
+                    self.label.append(is_poisoned)
+
+            self._save(save_path)
+
+        else:  # load
+            if args.use_archi:
+                save_path = os.path.join(
+                    save_path, args.architecture, 'data.ds')
+            else:
+                save_path = os.path.join(save_path, 'data.ds')
+
+            if not os.path.exists(save_path):
+                raise ValueError('file not exists please process data')
+
+            logger.info(f'载入{self.mode}数据')
+            self._load(save_path)
+
     # 已经完成数据读取，后面再接着写就行
     def _load(self, save_path):
         """_summary_
@@ -222,3 +226,145 @@ class MyDataset(Dataset):
             label_li.append(label)
 
         return torch.tensor(np.array(data_li, dtype=np.float32), dtype=torch.float32), torch.tensor(np.array(label_li, np.int64), dtype=torch.long)
+
+
+class TestDataset(BaseDataset):
+    def __init__(self, mode='train') -> None:
+        """_summary_
+            构建数据集，首先判断是否要调用模型转为onnx的函数，接下来判断是否处理过的数据是否保存了，如果已经存在直接读取就行，否则就使用onnx转张量的函数来进行数据处理。最终数据存储到self.data中，标签存放在self.label中
+        Keyword Arguments:
+            mode -- 要读取哪个数据集的数据，train，eval，test (default: {'train'})
+        """
+        super().__init__()
+        self.data = list()
+        self.label = list()
+        self.row_mask = list()
+        self.node_mask = list()
+        self.archi = list()
+        self.mode = mode
+        self.use_list = args.use_list
+        self.save_dir = args.onnx_model
+
+        if args.load_parameter:
+            for model_use in self.use_list:
+                if model_use == 'leader_one':
+                    self._trans_leader_one_model()
+                elif model_use == 'leader_two':
+                    self._trans_leader_two_model()
+                if model_use == 'vgg':
+                    self._trans_vgg_model()
+                if model_use == 'resnet':
+                    self._trans_resnet_model()
+
+        file_name = '+'.join(self.use_list)
+        save_path = os.path.join(args.data_save, file_name, self.mode)
+        if args.process_data:  # save
+            for model_use in self.use_list:
+                if args.use_archi:
+                    model_paths = os.path.join(
+                        self.save_dir, model_use, self.mode, args.architecture, '*.onnx')
+                else:
+                    model_paths = os.path.join(
+                        self.save_dir, model_use, self.mode, '*.onnx')
+
+                model_paths = glob(model_paths)
+
+                for model_path in tqdm(model_paths, desc=f'正在从{model_use}的{self.mode}的结构{args.architecture if args.use_archi else "all"}:onnx数据导入dataset'):
+                    if 'clean' in re.split(r'\.|/|_', model_path):
+                        is_poisoned = 0
+                    elif 'poisoned' in re.split(r'\.|/|_', model_path):
+                        is_poisoned = 1
+                    else:
+                        raise NameError(f'文件命名错误,当前文件路径:{model_path}')
+
+                    data_res = onnx2dgltest(model_path)
+
+                    self.data.append(data_res[0])
+                    self.row_mask.append(data_res[1])
+                    self.node_mask.append(data_res[2])
+                    self.archi.append(data_res[3])
+                    self.label.append(is_poisoned)
+
+            self._save(save_path)
+
+        else:  # load
+            if args.use_base:
+                file_name='base_data.ds'
+            else :
+                file_name='bin_data.ds'
+            if args.use_archi:
+                save_path = os.path.join(
+                    save_path, args.architecture, file_name)
+            else:
+                save_path = os.path.join(save_path, file_name)
+
+            if not os.path.exists(save_path):
+                raise ValueError('file not exists please process data')
+
+            logger.info(f'载入{self.mode}数据')
+            self._load(save_path)
+
+    # 已经完成数据读取，后面再接着写就行
+    def _load(self, save_path):
+        """_summary_
+            直接读入数据
+        Arguments:
+            save_path -- 数据存储的位置
+        """
+        self.data, self.row_mask, self.node_mask, self.label, self.archi = torch.load(
+            save_path)
+
+    def _save(self, save_path):
+        """_summary_
+            保存已经处理好的数据
+        Arguments:
+            save_path -- 数据保存的位置
+        """
+        if args.use_base:
+            file_name='base_data.ds'
+        else :
+            file_name='bin_data.ds'
+
+        if args.use_archi:
+            save_path = os.path.join(
+                save_path, args.architecture, file_name)
+        else:
+            save_path = os.path.join(save_path, file_name)
+        if not os.path.exists(os.path.dirname(save_path)):
+            os.makedirs(os.path.dirname(save_path))
+
+        torch.save((self.data, self.row_mask,
+                   self.node_mask, self.label, self.archi), save_path)
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, index) -> tuple:
+        return self.data[index], self.row_mask[index], self.node_mask[index], self.label[index], self.archi[index]
+
+    @staticmethod
+    def coll_fn(batch):
+        data_li = list()
+        label_li = list()
+        row_mask_li = list()
+        node_mask_li = list()
+        archi_li = list()
+
+        for data, row_mask, nodemask, label, archi in batch:
+            if not isinstance(data,torch.Tensor):
+                data = torch.tensor(data,dtype=torch.float32)
+            if not isinstance(row_mask,torch.Tensor):  
+                row_mask = torch.tensor(row_mask,dtype=torch.float32)
+            if not isinstance(nodemask,torch.Tensor):
+                nodemask = torch.tensor(nodemask,dtype=torch.float32)
+            if not isinstance(label,torch.Tensor):
+                label = torch.tensor(label,dtype=torch.long)
+            if not isinstance(archi,torch.Tensor):
+                archi = torch.tensor(archi,dtype=torch.float32)
+            data_li.append(data)
+            label_li.append(label)
+            row_mask_li.append(row_mask)
+            node_mask_li.append(nodemask)
+            archi_li.append(archi)
+
+        return torch.stack(data_li,dim=0), torch.stack(row_mask_li,dim=0), torch.stack(node_mask_li,dim=0), torch.stack(label_li,dim=0), torch.stack(archi_li,dim=0)

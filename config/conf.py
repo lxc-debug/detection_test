@@ -63,6 +63,7 @@ parser.add_argument('--use_base', default=False, action='store_true',
 parser.add_argument('--use_three', default=False,
                     action='store_true', help='whether add architecture data')
 parser.add_argument('--use_q',default=False,action='store_true',help='whether use q to aggregate')
+parser.add_argument('--test',default=False,action='store_true',help='whether test')
 
 # hyperparameters
 parser.add_argument('--bin_num', default=14, type=int, help='number of bins')
@@ -72,7 +73,7 @@ parser.add_argument('--patience', default=100, type=int,
                     help='patience of early stopping')
 parser.add_argument('--delta', default=0, type=float,
                     help='delta for early stopping')
-parser.add_argument('--batch_size', default=200, type=int,
+parser.add_argument('--batch_size', default=20, type=int,
                     help='batch size for train eval test')
 parser.add_argument('--epochs', default=1000000,
                     type=int, help='epochs for train')
@@ -82,14 +83,14 @@ parser.add_argument('--weight_decay', default=0,
                     type=float, help='weight_decay for train')
 parser.add_argument('--padding_dim', default=30,
                     type=int, help='padding dim for data')
-parser.add_argument('--row_size', default=1024, type=int,
+parser.add_argument('--row_size', default=2048, type=int,
                     help='row size of a feature')
 parser.add_argument('--op_type_size', default=215,
                     type=int, help='size of operator type')
 parser.add_argument('--pos_emb_dim', default=16, type=int,
                     help='the dimension of position embedding')
 # 得有这个参数来保证row_size这个列表是一个等大的，这样比较好操作
-parser.add_argument('--num_nodes', default=120, type=int,
+parser.add_argument('--num_nodes', default=400, type=int,
                     help='the number of all graph nodes')
 parser.add_argument('--n_head',default=8,type=int,help='number of the attention head')
 

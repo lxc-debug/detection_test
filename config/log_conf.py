@@ -1,7 +1,7 @@
 import sys
 import logging
 import argparse
-from conf import args
+from config.conf import args
 from logging.config import dictConfig
 
 
