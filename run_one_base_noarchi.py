@@ -92,15 +92,16 @@ from config.log_conf import file_logger
 #         except subprocess.CalledProcessError:
 #             file_logger.error('something wrong in run.py')
 
+# subprocess.run(shlex.split(f'python main.py --lr {0.001} --weight_decay {0.0001}   --logdir {"./log_tmp/test_save/debug_base.log"}  --use_list {"leader_one"} --test  --use_base'))
 
-# subprocess.run(shlex.split(f'python main.py --lr {0.1} --weight_decay {0}   --logdir {"./log_tmp/test_save/debug_bin.log"}  --use_list {"leader_one"} --test --process_data'))
+# subprocess.run(shlex.split(f'python main.py --lr {0.001} --weight_decay {0.0001}   --logdir {"./log_tmp/par_emb_test_save/debug_base.log"}  --use_list {"leader_one"} --test --process_data --use_base --use_q_node --add_par_pos_emb'))
 
-lr_li = ['1e-1','1e-2','1e-3', '1e-4']
+lr_li = ['1e-2','1e-3', '1e-4']
 weight_decay_li = ['0', '1e-5','1e-4','1e-3','1e-2',]
 
 for weight_decay in weight_decay_li:
     for lr in lr_li:
         try:
-            subprocess.run(shlex.split(f'python main.py --lr {lr} --weight_decay {weight_decay}   --logdir {"./log_tmp/test_save/bin_noarchi.log"}  --use_list {"leader_one"} --test'),check=True)
+            subprocess.run(shlex.split(f'python main.py --lr {lr} --weight_decay {weight_decay}   --logdir {"./log_tmp/par_emb_test_save/base_noarchi.log"}  --use_list {"leader_one"} --test --use_base --add_par_pos_emb'),check=True)
         except subprocess.CalledProcessError:
             file_logger.error('something wrong in run.py')

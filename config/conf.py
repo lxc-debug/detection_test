@@ -62,8 +62,12 @@ parser.add_argument('--use_base', default=False, action='store_true',
                     help='whether use base method to process data')
 parser.add_argument('--use_three', default=False,
                     action='store_true', help='whether add architecture data')
-parser.add_argument('--use_q',default=False,action='store_true',help='whether use q to aggregate')
+parser.add_argument('--use_q',default=False,action='store_true',help='whether use q to aggregate row_size')
 parser.add_argument('--test',default=False,action='store_true',help='whether test')
+parser.add_argument('--use_q_node',default=False,action='store_true',help='whether use q to aggregate node_size')
+parser.add_argument('--add_par_pos_emb',default=False,action='store_true',help='whether add position embedding to parameter')
+parser.add_argument('--main',default=False,action='store_true',help='whether implement main experiment')
+
 
 # hyperparameters
 parser.add_argument('--bin_num', default=14, type=int, help='number of bins')
@@ -87,7 +91,7 @@ parser.add_argument('--row_size', default=2048, type=int,
                     help='row size of a feature')
 parser.add_argument('--op_type_size', default=215,
                     type=int, help='size of operator type')
-parser.add_argument('--pos_emb_dim', default=16, type=int,
+parser.add_argument('--pos_emb_dim', default=32, type=int,
                     help='the dimension of position embedding')
 # 得有这个参数来保证row_size这个列表是一个等大的，这样比较好操作
 parser.add_argument('--num_nodes', default=400, type=int,
