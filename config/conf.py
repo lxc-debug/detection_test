@@ -23,18 +23,30 @@ parser.add_argument('--leadertwo_eval_data_dir', default=['data/leader_two/poiso
                     'data/leader_two/clean_models_eval'], nargs='+', help='position of leadertwo eval data')
 parser.add_argument('--leadertwo_test_data_dir', default=['data/leader_two/poisoned_models_test',
                     'data/leader_two/clean_models_test'], nargs='+', help='position of leadertwo test data')
+parser.add_argument('--leaderthree_train_data_dir', default=['data/leader_three/poisoned_models_trainval',
+                    'data/leader_three/clean_models_trainval'], nargs='+', help='position of leaderthree train data')
+parser.add_argument('--leaderthree_eval_data_dir', default=['data/leader_three/poisoned_models_eval',
+                    'data/leader_three/clean_models_eval'], nargs='+', help='position of leaderthree eval data')
+parser.add_argument('--leaderthree_test_data_dir', default=['data/leader_three/poisoned_models_test',
+                    'data/leader_three/clean_models_test'], nargs='+', help='position of leaderthree test data')
+parser.add_argument('--leaderfour_train_data_dir', default=['data/leader_four/poisoned_models_trainval',
+                    'data/leader_four/clean_models_trainval'], nargs='+', help='position of leaderfour train data')
+parser.add_argument('--leaderfour_eval_data_dir', default=['data/leader_four/poisoned_models_eval',
+                    'data/leader_four/clean_models_eval'], nargs='+', help='position of leaderfour eval data')
+parser.add_argument('--leaderfour_test_data_dir', default=['data/leader_four/poisoned_models_test',
+                    'data/leader_four/clean_models_test'], nargs='+', help='position of leaderfour test data')
 parser.add_argument('--vgg_train_data_dir', default=['data/vgg/poisoned_models_trainval',
-                    'data/vgg/clean_models_trainval'], nargs='+', help='position of leadertwo train data')
+                    'data/vgg/clean_models_trainval'], nargs='+', help='position of vgg train data')
 parser.add_argument('--vgg_eval_data_dir', default=['data/vgg/poisoned_models_eval',
-                    'data/vgg/clean_models_eval'], nargs='+', help='position of leadertwo eval data')
+                    'data/vgg/clean_models_eval'], nargs='+', help='position of vgg eval data')
 parser.add_argument('--vgg_test_data_dir', default=['data/vgg/poisoned_models_test',
-                    'data/vgg/clean_models_test'], nargs='+', help='position of leadertwo test data')
+                    'data/vgg/clean_models_test'], nargs='+', help='position of vgg test data')
 parser.add_argument('--resnet_train_data_dir', default=['data/resnet/poisoned_models_trainval',
-                    'data/resnet/clean_models_trainval'], nargs='+', help='position of leadertwo train data')
+                    'data/resnet/clean_models_trainval'], nargs='+', help='position of resnet train data')
 parser.add_argument('--resnet_eval_data_dir', default=['data/resnet/poisoned_models_eval',
-                    'data/resnet/clean_models_eval'], nargs='+', help='position of leadertwo eval data')
+                    'data/resnet/clean_models_eval'], nargs='+', help='position of resnet eval data')
 parser.add_argument('--resnet_test_data_dir', default=['data/resnet/poisoned_models_test',
-                    'data/resnet/clean_models_test'], nargs='+', help='position of leadertwo test data')
+                    'data/resnet/clean_models_test'], nargs='+', help='position of resnet test data')
 parser.add_argument('--para_save_dir', default='./best_parameter',
                     help='directory for saving best parameter')
 parser.add_argument(
@@ -67,6 +79,7 @@ parser.add_argument('--test',default=False,action='store_true',help='whether tes
 parser.add_argument('--use_q_node',default=False,action='store_true',help='whether use q to aggregate node_size')
 parser.add_argument('--add_par_pos_emb',default=False,action='store_true',help='whether add position embedding to parameter')
 parser.add_argument('--main',default=False,action='store_true',help='whether implement main experiment')
+parser.add_argument('--main_pos',default=False,action='store_true',help='whether add pos_emb at main experiment')
 
 
 # hyperparameters
@@ -77,8 +90,8 @@ parser.add_argument('--patience', default=100, type=int,
                     help='patience of early stopping')
 parser.add_argument('--delta', default=0, type=float,
                     help='delta for early stopping')
-parser.add_argument('--batch_size', default=20, type=int,
-                    help='batch size for train eval test')
+parser.add_argument('--batch_size', default=10, type=int,
+                    help='batch size for train eval test') # leaderone 20
 parser.add_argument('--epochs', default=1000000,
                     type=int, help='epochs for train')
 parser.add_argument('--lr', default=1e-4, type=float,
@@ -87,15 +100,14 @@ parser.add_argument('--weight_decay', default=0,
                     type=float, help='weight_decay for train')
 parser.add_argument('--padding_dim', default=30,
                     type=int, help='padding dim for data')
-parser.add_argument('--row_size', default=2048, type=int,
-                    help='row size of a feature')
+parser.add_argument('--row_size', default=4096, type=int,
+                    help='row size of a feature') # leader_one 2048
 parser.add_argument('--op_type_size', default=215,
                     type=int, help='size of operator type')
 parser.add_argument('--pos_emb_dim', default=32, type=int,
                     help='the dimension of position embedding')
-# 得有这个参数来保证row_size这个列表是一个等大的，这样比较好操作
-parser.add_argument('--num_nodes', default=400, type=int,
-                    help='the number of all graph nodes')
+parser.add_argument('--num_nodes', default=650, type=int,
+                    help='the number of all graph nodes') # leader_one 400
 parser.add_argument('--n_head',default=8,type=int,help='number of the attention head')
 
 
